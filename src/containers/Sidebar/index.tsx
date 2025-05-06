@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { SwitchContainer, SwitchInput, SwitchSlider, SidebarContainer } from './styles'
+import {
+  SwitchContainer,
+  SwitchInput,
+  SwitchSlider,
+  SidebarContainer
+} from './styles'
 import Avatar from '../../components/Avatar'
 import Paragrafo from '../../components/Paragrafo'
 import Titulo from '../../components/Titulo'

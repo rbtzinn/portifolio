@@ -15,7 +15,7 @@ export const SwitchSlider = styled.span`
 
   &:before {
     position: absolute;
-    content: "";
+    content: '';
     height: 22px;
     width: 22px;
     left: 4px;
