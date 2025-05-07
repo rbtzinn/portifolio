@@ -24,7 +24,7 @@ const projetos = [
     nome: 'Projeto E-commerce',
     descricao:
       'Loja virtual com base no design do site do mercado livre com responsividade e funcionalidades de carrinho bem didático, carousel, listagem de produtos, cálculo de frete com CEP entre outras coisas. ',
-    ferramentas: 'React + Vite/JavaScript/CSS5 ',
+    ferramentas: 'React + Vite/JavaScript/CSS ',
     link: 'https://ycommerce-taupe.vercel.app'
   },
   {
@@ -33,6 +33,20 @@ const projetos = [
       'Projeto com botoes de adicionar tarefas, ver as pendentes ou finalizadas, conseguir "riscar" as tarefas já feitas.',
     ferramentas: 'VueJS/JavaScript/HTML',
     link: 'https://todo-vue-zeta-six.vercel.app'
+  },
+  {
+    nome: 'Projeto E-commerce responsivo',
+    descricao:
+      ' E-commerce fictício com foco em design responsivo e interatividade do usuário. Inclui funcionalidades como sistema de login/logout básico e zoom em produtos para visualização detalhada.  Recursos como carrossel de destaques, navbar responsiva e layout otimizado para diferentes dispositivos foram implementados, com ênfase na experiência do usuário.  Projeto em evolução, com potencial para melhorias e novas funcionalidades.',
+    ferramentas: 'JavaScript/Bootstrap(Avançado)',
+    link: 'https://ecommerce-xi-ten-83.vercel.app/index.html#'
+  },
+  {
+    nome: 'Projeto Clone Disney+',
+    descricao:
+      ' Projeto feito para praticar e adicionar ao portfólio com intuito de alimentar também o github. Usando boas práticas de CSS – Block Element Modifier (BEM) Projeto em evolução, com potencial para melhorias até mesmo adições de APIs e novas funcionalidades.',
+    ferramentas: 'Gulp/Java Script/Sass',
+    link: 'https://clone-disneyplus-one-pi.vercel.app/'
   }
 ]
 
