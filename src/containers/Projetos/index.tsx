@@ -6,6 +6,13 @@ import Titulo from '../../components/Titulo'
 import { Lista } from './styles'
 
 const projetos = [
+   {
+    nome: 'Leitor de RFID – Novo Atacarejo',
+    descricao:
+      'Aplicativo Android em Java para inventário de bens utilizando leitura de etiquetas RFID, integrado com arquivos CSV para atualização em tempo real da planilha de inventário da loja. Fluxo pensado pra agilidade do usuário, com leitura rápida de etiquetas, atualização automática do setor, e geração de relatório consolidado ao final de cada inventário. Permite seleção de loja, setor e registro individualizado de cada item lido, informando erros ou itens não encontrados em tempo real. Funcionalidade de exportação da planilha editada e logs detalhados de cada movimentação dos itens, facilitando a conferência do inventário completo por setor. Projeto em uso no Novo Atacarejo, com possibilidade de personalização e expansão para outros estabelecimentos.',
+    ferramentas: 'Java',
+    link: 'https://github.com/rbtzinn/RFID-NovoAtacarejo'
+  },
   {
     nome: 'Projeto Random Teams',
     descricao:
