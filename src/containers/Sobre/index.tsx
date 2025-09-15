@@ -6,17 +6,9 @@ const Sobre = () => (
   <section>
     <Titulo fontSize={16}>Sobre mim</Titulo>
     <Paragrafo tipo="principal">
-      Engenheiro Front-End em formação pela EBAC – Escola Britânica de Artes
-      Criativas e Tecnologia, graduando em Ciência da Computação pela
-      UNINASSAU-Recife, com inglês intermediário. Profissional com perfil
-      proativo, analítico e comprometido com a construção de soluções web
-      eficientes, responsivas e bem estruturadas. Em constante evolução técnica,
-      busca aplicar boas práticas de desenvolvimento front-end, com foco em
-      usabilidade, performance e organização de código. Está sempre alimentando
-      seu portfólio com projetos relevantes, reforçando seu aprendizado prático
-      e demonstrando evolução contínua. Demonstra facilidade de aprendizado,
-      interesse por novas tecnologias e dedicação ao aprimoramento constante de
-      suas habilidades.
+      Sou um Engenheiro Front-End graduado em Ciência da Computação pela UNINASSAU-Recife e com especialização pela EBAC. Minha paixão é transformar ideias em soluções web que sejam ao mesmo tempo eficientes, responsivas e bem estruturadas.
+
+Com um perfil proativo e analítico, foco em aplicar boas práticas de desenvolvimento para garantir usabilidade, performance e um código sempre organizado. Estou em constante evolução, alimentando meu portfólio com projetos que refletem meu aprendizado prático e minha dedicação em dominar novas tecnologias.
     </Paragrafo>
     <GithubSecao>
       <img src="https://github-readme-stats.vercel.app/api?username=rbtzinn&show_icons=true&theme=dracula&include_all_commits=true&count_private=true" />
