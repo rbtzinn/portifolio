@@ -6,26 +6,26 @@ import Titulo from '../../components/Titulo'
 import { Lista } from './styles'
 
 const projetos = [
-   {
+  {
+    nome: 'Projeto Efood',
+    descricao:
+      'Plataforma de delivery que conecta usuários a diversos restaurantes. Permite explorar o catálogo de restaurantes, visualizar os produtos de cada um, adicionar itens ao carrinho e finalizar a compra através de um checkout integrado com API.',
+    ferramentas: 'React/TypeScript/Redux Toolkit/Styled-Components',
+    link: 'https://efood-api-ywcp.vercel.app/'
+  },
+  {
     nome: 'Leitor de RFID – Novo Atacarejo',
     descricao:
-      'Aplicativo Android em Java para inventário de bens utilizando leitura de etiquetas RFID, integrado com arquivos CSV para atualização em tempo real da planilha de inventário da loja. Fluxo pensado pra agilidade do usuário, com leitura rápida de etiquetas, atualização automática do setor, e geração de relatório consolidado ao final de cada inventário. Permite seleção de loja, setor e registro individualizado de cada item lido, informando erros ou itens não encontrados em tempo real. Funcionalidade de exportação da planilha editada e logs detalhados de cada movimentação dos itens, facilitando a conferência do inventário completo por setor. Projeto em uso no Novo Atacarejo, com possibilidade de personalização e expansão para outros estabelecimentos.',
+      'App Android em Java pra inventário com RFID, integração em tempo real com planilha CSV, leitura rápida, atualização automática por setor e exportação dos dados. Projeto já em uso no Novo Atacarejo.',
     ferramentas: 'Java',
     link: 'https://github.com/rbtzinn/RFID-NovoAtacarejo'
   },
   {
     nome: 'Projeto Random Teams',
     descricao:
-      'Um projeto que foi feito para randomizar times para jogos de futebol ou outros esportes, com o diferencial de adicionar o nível do jogador para balancear os times.',
+      'Um projeto que foi feito para randomizar times para jogos de futebol ou outros esportes, com o diferencial de adicionar o nível do jogador para balancear os times. Com api do Firebase integrada para autenticação e salvar lista de jogadores.',
     ferramentas: 'React/TypeScript/Bootstrap/Sass ',
     link: 'https://random-teams-one.vercel.app'
-  },
-  {
-    nome: 'Projeto Clone GGmax',
-    descricao:
-      'Um Projeto baseado na GGMAX, um site de vendas de jogos ou produtos para jogos com uma integração backend e resposividade para varios tipos de telas.',
-    ferramentas: 'React/TypeScript/Sass ',
-    link: 'https://clone-ggmax-deju.vercel.app'
   },
   {
     nome: 'Projeto E-commerce',
