@@ -24,7 +24,7 @@ const projetos = [
     nome: 'Projeto Random Teams',
     descricao:
       'Um projeto que foi feito para randomizar times para jogos de futebol ou outros esportes, com o diferencial de adicionar o nível do jogador para balancear os times. Com api do Firebase integrada para autenticação e salvar lista de jogadores.',
-    ferramentas: 'React/TypeScript/Bootstrap/Sass ',
+    ferramentas: 'React/TypeScript/Bootstrap/Sass/firebase ',
     link: 'https://random-teams-one.vercel.app'
   },
   {
@@ -54,7 +54,14 @@ const projetos = [
       ' Projeto feito para praticar e adicionar ao portfólio com intuito de alimentar também o github. Usando boas práticas de CSS – Block Element Modifier (BEM) Projeto em evolução, com potencial para melhorias até mesmo adições de APIs e novas funcionalidades.',
     ferramentas: 'Gulp/Java Script/Sass',
     link: 'https://clone-disneyplus-one-pi.vercel.app/'
-  }
+  },
+  {
+  nome: 'BarberBook – Sistema de Agendamento para Barbearias',
+  descricao:
+    'Aplicação completa para agendamento de horários em barbearias. Permite que barbeiros cadastrem sua barbearia, configurem horários e gerem link público para clientes. Os clientes podem buscar barbearias por localização, visualizar disponibilidade em tempo real e agendar cortes. Projeto em constante evolução, com implementação de tema dark/light, máscaras de formulário, validações e interface responsiva.',
+  ferramentas: 'React/Vite/TypeScript/Styled-Components/Firebase',
+  link: 'https://barbearia-agendamentos-flame.vercel.app/'
+ }
 ]
 
 const Projetos = () => (
