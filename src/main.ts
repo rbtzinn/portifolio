@@ -420,7 +420,7 @@ const HELLOS = [
   'Oi! Eu sou o Roberto 👋',
   'Bora construir algo juntos?',
   'Tô compilando umas ideias aqui…',
-  'Role pra baixo, tem mais coisa!',
+  'Bem-vindo ao Porto de Sinais ⚓',
   'Clicou de novo? Gostei de você 😄'
 ]
 let helloI = 0

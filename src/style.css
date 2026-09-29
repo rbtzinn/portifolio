@@ -560,37 +560,6 @@ body.ready .hero-title .ch {
   font-size: clamp(15px, 1.3vw, 19px);
   color: #cfcac1;
 }
-.scroll-hint {
-  margin-top: 30px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.mouse {
-  width: 20px;
-  height: 32px;
-  border: 1px solid var(--muted);
-  border-radius: 12px;
-  display: grid;
-  justify-items: center;
-  padding-top: 6px;
-}
-.mouse i {
-  width: 2px;
-  height: 6px;
-  background: var(--accent);
-  border-radius: 2px;
-  animation: wheel 1.6s var(--ease) infinite;
-}
-@keyframes wheel {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(12px); opacity: 0; }
-}
 
 /* Projeto */
 .proj-meta {
@@ -1203,7 +1172,6 @@ body.no-webgl #scene {
 @media (prefers-reduced-motion: reduce) {
   .grain,
   .hint-ico,
-  .mouse i,
   .dot {
     animation: none;
   }
