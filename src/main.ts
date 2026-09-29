@@ -23,8 +23,8 @@ import { createPort } from './world/port'
 import { createLighthouse } from './world/lighthouse'
 import { createBuoys } from './world/buoys'
 import { createBadge } from './world/badge'
-import { createAvatar } from './world/avatar'
-import { AVATAR_SIT, AVATAR_STAND, BADGE_POS, LANTERN, LIFT_HEIGHT, PROJECT_SLOTS, QUAY_TOP } from './world/layout'
+import { createPortrait } from './world/portrait'
+import { PORTRAIT_POS, BADGE_POS, LANTERN, LIFT_HEIGHT, PROJECT_SLOTS, QUAY_TOP } from './world/layout'
 
 // ————————————————————————————————————————————————————————— utilidades
 const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x))
@@ -67,7 +67,7 @@ const STOPS: Stop[] = [
     mShift: [0, 0.3],
     mZoom: 1,
     mPos: v3(3.3, 2.25, 81.2),
-    mLook: AVATAR_SIT.clone().add(v3(0, 0.75, 0))
+    mLook: PORTRAIT_POS.clone().add(v3(0, 0.2, 0))
   },
   {
     pos: BADGE_POS.clone().add(v3(0.5, 0.2, 7.4)),
@@ -145,7 +145,7 @@ type World = {
   light: ReturnType<typeof createLighthouse>
   buoys: ReturnType<typeof createBuoys>
   badge: ReturnType<typeof createBadge>
-  avatar: ReturnType<typeof createAvatar>
+  portrait: ReturnType<typeof createPortrait>
   rings: THREE.Mesh[]
   motes: THREE.Points
   moteMat: THREE.ShaderMaterial
@@ -191,8 +191,10 @@ function buildWorld(photo?: HTMLImageElement): World {
   scene.add(buoys.group)
   const badge = createBadge(photo)
   scene.add(badge.anchor)
-  const avatar = createAvatar()
-  scene.add(avatar.root)
+  const portrait = createPortrait(2.6)
+  portrait.group.position.copy(PORTRAIT_POS)
+  portrait.faceTowards(STOPS[0].pos)
+  scene.add(portrait.group)
 
   // ondas RFID que saem do contêiner em foco
   const rings: THREE.Mesh[] = []
@@ -250,7 +252,7 @@ function buildWorld(photo?: HTMLImageElement): World {
   motes.frustumCulled = false
   scene.add(motes)
 
-  return { sky, water, port, light, buoys, badge, avatar, rings, motes, moteMat }
+  return { sky, water, port, light, buoys, badge, portrait, rings, motes, moteMat }
 }
 
 // ————————————————————————————————————————————————————————— rolagem
@@ -333,13 +335,11 @@ const raycaster = new THREE.Raycaster()
 let hoverProject = -1
 let hoverBadge = false
 let hoverAvatar = false
-let lastMouseMove = -10
 let scanP = 0
 let scanned = -1
 let needsRay = false
 let drag: { x: number; y: number; moved: number; id: number } | null = null
 let flashBeam = 0
-let greetedFarol = false
 
 if (!IS_TOUCH) document.body.classList.add('has-cursor')
 addEventListener('pointermove', (e) => {
@@ -347,7 +347,6 @@ addEventListener('pointermove', (e) => {
   pointerPx.x = e.clientX
   pointerPx.y = e.clientY
   needsRay = true
-  if (e.pointerType === 'mouse') lastMouseMove = performance.now()
   if (drag && e.pointerId === drag.id && world) {
     const dx = e.clientX - drag.x
     drag.moved += Math.abs(dx) + Math.abs(e.clientY - drag.y)
@@ -401,7 +400,7 @@ function raycast() {
   if (!world || manifest.isOpen()) return
   raycaster.setFromCamera(mouse, camera)
   const f = progress()
-  if (world.avatar.root.visible) hoverAvatar = raycaster.intersectObjects(world.avatar.hit, false).length > 0
+  if (world.portrait.group.visible && f < 0.4) hoverAvatar = world.portrait.hitTest(raycaster.intersectObject(world.portrait.mesh, false)[0]?.uv)
   if (f > 0.5 && f < 1.6) {
     hoverBadge = raycaster.intersectObjects(world.badge.hit, false).length > 0
   }
@@ -432,7 +431,7 @@ function say(text: string, secs = 3.4) {
 }
 function greet(text?: string) {
   if (!world) return
-  world.avatar.wave()
+  world.portrait.scan()
   audio.blip(990, 0.08)
   setTimeout(() => audio.blip(1320, 0.08), 110)
   say(text ?? HELLOS[helloI++ % HELLOS.length])
@@ -750,52 +749,24 @@ function frame(time: number) {
   waterUniforms.uBeam.value = Math.max(contactK, Math.pow(facing, 30) * 0.8) + flashBeam
   skyUniforms.uFlash.value = contactK * (0.3 + 0.1 * Math.sin(t * 2)) + flashBeam * 0.4 + Math.pow(facing, 60) * 0.3
 
-  // ——— avatar
-  const atHero = fS < 1.7
-  const atFarol = fS > 8.1
-  const av = W.avatar
-  av.root.visible = atHero || atFarol
-  if (av.root.visible) {
-    const sit = fS < 4.5 ? 1 : 0
-    if (sit) {
-      av.root.position.copy(AVATAR_SIT)
-      av.root.rotation.y = 0.22
-    } else {
-      av.root.position.copy(AVATAR_STAND)
-      tmpA.subVectors(camera.position, AVATAR_STAND)
-      av.root.rotation.y = Math.atan2(tmpA.x, tmpA.z) - 0.35
-    }
-    // para onde olhar: o cursor (projetado na profundidade dele) ou a câmera
-    let lookW = 0
-    const lookPt = tmpB
-    const mouseFresh = performance.now() - lastMouseMove < 2600
-    if (!IS_TOUCH && mouseFresh && !atFarol) {
-      raycaster.setFromCamera(mouseS, camera)
-      const d = camera.position.distanceTo(av.root.position)
-      lookPt.copy(raycaster.ray.origin).addScaledVector(raycaster.ray.direction, d)
-      lookW = 1
-    } else {
-      lookPt.copy(camera.position)
-      lookW = atFarol ? 1 : clamp(fS * 3) // no toque/rolagem ele olha para você
-    }
-    av.update(dt, t, sit, lookPt, lookW, hoverAvatar)
+  // ——— retrato 3D real (some em partículas ao rolar)
+  const pr = W.portrait
+  const dissolve = smooth(0.06, 0.85, fS)
+  pr.group.visible = fS < 0.95
+  if (pr.group.visible) {
+    const par2 = REDUCED_MOTION ? 0 : 1
+    pr.update(dt, t, tmpVec2.set(mouseS.x * par2, mouseS.y * par2), dissolve, hoverAvatar, scale)
   }
   if (bubbleT > 0) {
     bubbleT -= dt
-    if (bubbleT <= 0 || !av.root.visible) {
+    if (bubbleT <= 0 || !pr.group.visible || dissolve > 0.3) {
       bubble.classList.remove('show')
       bubbleT = 0
     }
-    av.headJoint.getWorldPosition(tmpA)
-    tmpA.y += 0.55
+    pr.headAnchor.getWorldPosition(tmpA)
     tmpA.project(camera)
     bubble.style.transform = `translate3d(${((tmpA.x + 1) / 2) * innerWidth}px, ${((1 - tmpA.y) / 2) * innerHeight}px, 0)`
   }
-  if (atFarol && !greetedFarol && fS > 8.8) {
-    greetedFarol = true
-    setTimeout(() => (isPortrait() ? world?.avatar.wave() : greet('Tô te esperando aqui no farol! 🔦')), 500)
-  }
-  if (fS < 8) greetedFarol = false
 
   // ——— luzes piscantes
   W.port.blinkers.forEach((b) => {
@@ -820,7 +791,7 @@ function frame(time: number) {
     readerLabel.textContent = 'Lendo tag…'
   } else if (!scanning) {
     scanned = -1
-    readerLabel.textContent = hoverBadge ? 'Arraste · clique para virar' : hoverAvatar ? 'Clique · diga oi' : ''
+    readerLabel.textContent = hoverBadge ? 'Arraste · clique para virar' : hoverAvatar ? 'Clique · escanear' : ''
   }
   canvas.style.cursor = IS_TOUCH ? '' : 'none'
 

@@ -18,8 +18,7 @@ import {
   PIER_Z1,
   PIER_TOP,
   PIER_LAMP_ZS,
-  PIER_LAMP_X,
-  AVATAR_STAND
+  PIER_LAMP_X
 } from './layout'
 import { containerDoorMaps, containerLabel, containerMaps, glowTexture, quayPBR, quayTexture, woodTexture } from './textures'
 
@@ -325,19 +324,6 @@ export function createPort() {
   const bollard = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 0.4, 10), dark)
   bollard.position.set(PIER_X - PIER_W / 2 + 0.3, PIER_TOP + 0.2, PIER_Z1 - 0.4)
   group.add(bollard)
-
-  // ——— Rochas onde o avatar espera no capítulo do farol
-  const islet = new THREE.InstancedMesh(rockGeoShared, rockMatShared, 9)
-  for (let i = 0; i < 9; i++) {
-    const a = (i / 9) * Math.PI * 2
-    const r = i === 0 ? 0 : 1.2 + rand() * 0.8
-    const s = i === 0 ? 2.1 : 0.9 + rand() * 1.1
-    q.setFromEuler(new THREE.Euler(rand() * 3, rand() * 3, rand() * 3))
-    const y = i === 0 ? AVATAR_STAND.y - 2.05 : 0.1 + rand() * 1.1
-    m4.compose(new THREE.Vector3(AVATAR_STAND.x + Math.cos(a) * r * 1.3, y, AVATAR_STAND.z + Math.sin(a) * r * 1.3), q, new THREE.Vector3(s, s * 0.95, s))
-    islet.setMatrixAt(i, m4)
-  }
-  group.add(islet)
 
   // ——— Navio porta-contêineres atracado à esquerda
   const ship = createShip([contSide, contSide, contSide, contSide, contDoor, contDoor], addGlow)

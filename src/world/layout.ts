@@ -23,7 +23,7 @@ export const BUOYS = [
   new THREE.Vector3(121, 0, 38)
 ]
 
-// Píer de madeira que sai do cais em direção ao mar (onde o avatar fica na chegada)
+// Píer de madeira que sai do cais em direção ao mar (onde o retrato fica na chegada)
 export const PIER_X = 6
 export const PIER_W = 2.6
 export const PIER_Z1 = 76
@@ -37,8 +37,8 @@ export const WATER_LAMPS = [
   ...PIER_LAMP_ZS.map((z) => new THREE.Vector2(PIER_LAMP_X, z))
 ]
 
-export const AVATAR_SIT = new THREE.Vector3(PIER_X - 0.25, PIER_TOP, PIER_Z1 - 0.28)
-export const AVATAR_STAND = new THREE.Vector3(126.9, 3.1, 33.4)
+// retrato 3D do Roberto "projetado" na ponta do píer
+export const PORTRAIT_POS = new THREE.Vector3(PIER_X + 0.9, PIER_TOP + 1.2, PIER_Z1 - 2.2)
 
 export const LIGHTHOUSE = new THREE.Vector3(152, 0, -12)
 export const LIGHTHOUSE_H = 27
