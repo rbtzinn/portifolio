@@ -1,0 +1,28 @@
+import * as THREE from 'three'
+
+// Geografia do porto (unidades ≈ metros)
+export const QUAY_EDGE_Z = -8
+export const QUAY_TOP = 1.6
+export const QUAY_X: [number, number] = [-84, 72]
+export const QUAY_Z: [number, number] = [-140, QUAY_EDGE_Z]
+
+export const LAMP_XS: number[] = []
+for (let x = -78; x <= 66; x += 12) LAMP_XS.push(x)
+export const LAMP_Z = QUAY_EDGE_Z - 1.2
+export const LAMP_H = 11
+
+export const PROJECT_SLOTS = [0, 9, 18, 27, 36].map((x) => new THREE.Vector3(x, QUAY_TOP, -16))
+export const LIFT_HEIGHT = 5.2
+
+export const BADGE_POS = new THREE.Vector3(-36, 5.6, -2.5)
+
+export const BUOYS = [
+  new THREE.Vector3(66, 0, 22),
+  new THREE.Vector3(84, 0, 34),
+  new THREE.Vector3(103, 0, 28),
+  new THREE.Vector3(121, 0, 38)
+]
+
+export const LIGHTHOUSE = new THREE.Vector3(152, 0, -12)
+export const LIGHTHOUSE_H = 27
+export const LANTERN = new THREE.Vector3(LIGHTHOUSE.x, LIGHTHOUSE_H + 2.2, LIGHTHOUSE.z)
