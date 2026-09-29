@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { TIER } from '../tier'
 import { FOG_COLOR, MOON_DIR, SKY_GLSL } from './sky'
-import { LAMP_XS, LAMP_Z, LANTERN, QUAY_EDGE_Z, QUAY_X, LIGHTHOUSE } from './layout'
+import { LANTERN, QUAY_EDGE_Z, QUAY_X, LIGHTHOUSE, WATER_LAMPS } from './layout'
 
 const SIZE = 900
 
@@ -10,7 +10,7 @@ export const waterUniforms = {
   uMoonDir: { value: MOON_DIR },
   uFog: { value: FOG_COLOR },
   uFogDensity: { value: 0.0062 },
-  uLamps: { value: LAMP_XS.map((x) => new THREE.Vector2(x, LAMP_Z)) },
+  uLamps: { value: WATER_LAMPS },
   uLantern: { value: new THREE.Vector2(LANTERN.x, LANTERN.z) },
   uBeam: { value: 0 },
   uFocus: { value: new THREE.Vector3(0, -100, 0) },
@@ -52,7 +52,7 @@ export function createWater() {
       uniform vec3 uMoonDir;
       uniform vec3 uFog;
       uniform float uFogDensity;
-      uniform vec2 uLamps[${LAMP_XS.length}];
+      uniform vec2 uLamps[${WATER_LAMPS.length}];
       uniform vec2 uLantern;
       uniform float uBeam;
       uniform vec3 uFocus;
@@ -104,8 +104,10 @@ export function createWater() {
         vec2 cam = cameraPosition.xz;
         float flick = 0.45 + 0.9 * noise(wp.xz * vec2(1.6, 0.35) + vec2(0.0, t * 1.4));
         float s = 0.0;
-        for (int i = 0; i < ${LAMP_XS.length}; i++) s += streak(uLamps[i] + vec2(0.0, 1.4), p, cam, 0.6, 26.0);
-        col += vec3(1.0, 0.46, 0.14) * s * flick * 0.9;
+        for (int i = 0; i < ${WATER_LAMPS.length}; i++) s += streak(uLamps[i] + vec2(0.0, 1.4), p, cam, 0.6, 26.0);
+        // de cima, reflexos longos não fazem sentido físico: somem com a altitude
+        float lowCam = smoothstep(45.0, 12.0, cameraPosition.y);
+        col += vec3(1.0, 0.46, 0.14) * s * flick * 0.9 * lowCam;
 
         // farol
         float ls = streak(uLantern + vec2(0.0, 3.0), p, cam, 1.2, 70.0);

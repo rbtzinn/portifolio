@@ -12,9 +12,16 @@ import {
   QUAY_TOP,
   QUAY_X,
   QUAY_Z,
-  BADGE_POS
+  BADGE_POS,
+  PIER_X,
+  PIER_W,
+  PIER_Z1,
+  PIER_TOP,
+  PIER_LAMP_ZS,
+  PIER_LAMP_X,
+  AVATAR_STAND
 } from './layout'
-import { containerDoorMaps, containerLabel, containerMaps, glowTexture, quayPBR, quayTexture } from './textures'
+import { containerDoorMaps, containerLabel, containerMaps, glowTexture, quayPBR, quayTexture, woodTexture } from './textures'
 
 const CONT = new THREE.Vector3(6.06, 2.59, 2.44)
 const PALETTE = ['#7d2a22', '#2c4f7c', '#3c6b4f', '#8a6a2b', '#5a5d63', '#8c3b1c', '#264a4a', '#6b2d4d', '#9aa0a6', '#b0612a']
@@ -273,6 +280,65 @@ export function createPort() {
   })
   group.add(heads, lenses)
 
+  const rockGeoShared = new THREE.IcosahedronGeometry(1, 1)
+  const rockMatShared = new THREE.MeshStandardMaterial({ color: '#3a3936', roughness: 0.92, flatShading: true, envMapIntensity: 1.2 })
+
+  // ——— Píer de madeira em direção ao mar
+  const pierLen = PIER_Z1 - QUAY_EDGE_Z
+  const wood = woodTexture()
+  wood.repeat.set(1, pierLen / 8)
+  const deckMat = new THREE.MeshStandardMaterial({ map: wood, roughness: 0.8, metalness: 0, envMapIntensity: 0.8 })
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(PIER_W, 0.22, pierLen), deckMat)
+  deck.position.set(PIER_X, PIER_TOP - 0.11, QUAY_EDGE_Z + pierLen / 2)
+  deck.receiveShadow = true
+  group.add(deck)
+  const pileMat = new THREE.MeshStandardMaterial({ color: '#2b2118', roughness: 0.95 })
+  const pileCount = Math.floor(pierLen / 4) * 2
+  const piles = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.16, 0.18, 4.2, 8), pileMat, pileCount)
+  for (let i = 0; i < pileCount / 2; i++)
+    for (const s of [-1, 1]) {
+      m4.makeTranslation(PIER_X + s * (PIER_W / 2 - 0.1), PIER_TOP - 2.05, QUAY_EDGE_Z + 2 + i * 4)
+      piles.setMatrixAt(i * 2 + (s > 0 ? 1 : 0), m4)
+    }
+  group.add(piles)
+  // corrimão de corda: postes baixos com lanternas
+  const postGeo = new THREE.CylinderGeometry(0.06, 0.07, 1.6, 6)
+  const posts = new THREE.InstancedMesh(postGeo, dark, PIER_LAMP_ZS.length)
+  PIER_LAMP_ZS.forEach((z, i) => {
+    m4.makeTranslation(PIER_LAMP_X, PIER_TOP + 0.8, z)
+    posts.setMatrixAt(i, m4)
+    addGlow(new THREE.Vector3(PIER_LAMP_X, PIER_TOP + 1.7, z), '#ffab5c', 1.1)
+    addGlow(new THREE.Vector3(PIER_LAMP_X, PIER_TOP + 1.7, z), '#fff0d8', 0.3)
+  })
+  group.add(posts)
+  const bulbs = new THREE.InstancedMesh(
+    new THREE.SphereGeometry(0.1, 10, 8),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffc987').multiplyScalar(4) }),
+    PIER_LAMP_ZS.length
+  )
+  PIER_LAMP_ZS.forEach((z, i) => {
+    m4.makeTranslation(PIER_LAMP_X, PIER_TOP + 1.68, z)
+    bulbs.setMatrixAt(i, m4)
+  })
+  group.add(bulbs)
+  // cabeços de amarração na ponta
+  const bollard = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 0.4, 10), dark)
+  bollard.position.set(PIER_X - PIER_W / 2 + 0.3, PIER_TOP + 0.2, PIER_Z1 - 0.4)
+  group.add(bollard)
+
+  // ——— Rochas onde o avatar espera no capítulo do farol
+  const islet = new THREE.InstancedMesh(rockGeoShared, rockMatShared, 9)
+  for (let i = 0; i < 9; i++) {
+    const a = (i / 9) * Math.PI * 2
+    const r = i === 0 ? 0 : 1.2 + rand() * 0.8
+    const s = i === 0 ? 2.1 : 0.9 + rand() * 1.1
+    q.setFromEuler(new THREE.Euler(rand() * 3, rand() * 3, rand() * 3))
+    const y = i === 0 ? AVATAR_STAND.y - 2.05 : 0.1 + rand() * 1.1
+    m4.compose(new THREE.Vector3(AVATAR_STAND.x + Math.cos(a) * r * 1.3, y, AVATAR_STAND.z + Math.sin(a) * r * 1.3), q, new THREE.Vector3(s, s * 0.95, s))
+    islet.setMatrixAt(i, m4)
+  }
+  group.add(islet)
+
   // ——— Navio porta-contêineres atracado à esquerda
   const ship = createShip([contSide, contSide, contSide, contSide, contDoor, contDoor], addGlow)
   ship.position.set(-128, 0, QUAY_EDGE_Z + 12)
@@ -299,10 +365,8 @@ export function createPort() {
   addGlow(new THREE.Vector3(BADGE_POS.x - 5.5, QUAY_TOP + 2, QUAY_EDGE_Z - 3.4), '#ffcf8a', 1.6)
 
   // ——— Quebra-mar até o farol
-  const rockGeo = new THREE.IcosahedronGeometry(1, 0)
-  const rockMat = new THREE.MeshStandardMaterial({ color: '#34343a', roughness: 1, flatShading: true })
   const rockCount = TIER.low ? 170 : 320
-  const rocks = new THREE.InstancedMesh(rockGeo, rockMat, rockCount)
+  const rocks = new THREE.InstancedMesh(rockGeoShared, rockMatShared, rockCount)
   for (let i = 0; i < rockCount; i++) {
     const t = rand()
     const x = QUAY_X[1] - 2 + t * (LIGHTHOUSE.x + 8 - QUAY_X[1])

@@ -23,7 +23,8 @@ import { createPort } from './world/port'
 import { createLighthouse } from './world/lighthouse'
 import { createBuoys } from './world/buoys'
 import { createBadge } from './world/badge'
-import { BADGE_POS, LANTERN, LIFT_HEIGHT, PROJECT_SLOTS, QUAY_TOP } from './world/layout'
+import { createAvatar } from './world/avatar'
+import { AVATAR_SIT, AVATAR_STAND, BADGE_POS, LANTERN, LIFT_HEIGHT, PROJECT_SLOTS, QUAY_TOP } from './world/layout'
 
 // ————————————————————————————————————————————————————————— utilidades
 const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x))
@@ -47,10 +48,27 @@ const audio = new Ambience()
 setupMagnetic()
 
 // ————————————————————————————————————————————————————————— paradas da câmera
-type Stop = { pos: THREE.Vector3; look: THREE.Vector3; shift: [number, number]; mShift: [number, number]; mZoom: number }
+type Stop = {
+  pos: THREE.Vector3
+  look: THREE.Vector3
+  shift: [number, number]
+  mShift: [number, number]
+  mZoom: number
+  mPos?: THREE.Vector3
+  mLook?: THREE.Vector3
+}
 const LIFT_Y = QUAY_TOP + 2.59 / 2 + LIFT_HEIGHT
 const STOPS: Stop[] = [
-  { pos: v3(8, 7, 84), look: v3(-2, 9, -30), shift: [0, 0], mShift: [0, 0.05], mZoom: 1.25 },
+  {
+    // chegada: câmera baixa na ponta do píer, com o Roberto programando em primeiro plano
+    pos: v3(4.3, 2.15, 80.6),
+    look: v3(2.2, 5.6, -40),
+    shift: [0, 0],
+    mShift: [0, 0.3],
+    mZoom: 1,
+    mPos: v3(3.3, 2.25, 81.2),
+    mLook: AVATAR_SIT.clone().add(v3(0, 0.75, 0))
+  },
   {
     pos: BADGE_POS.clone().add(v3(0.5, 0.2, 7.4)),
     look: BADGE_POS.clone(),
@@ -127,6 +145,7 @@ type World = {
   light: ReturnType<typeof createLighthouse>
   buoys: ReturnType<typeof createBuoys>
   badge: ReturnType<typeof createBadge>
+  avatar: ReturnType<typeof createAvatar>
   rings: THREE.Mesh[]
   motes: THREE.Points
   moteMat: THREE.ShaderMaterial
@@ -172,6 +191,8 @@ function buildWorld(photo?: HTMLImageElement): World {
   scene.add(buoys.group)
   const badge = createBadge(photo)
   scene.add(badge.anchor)
+  const avatar = createAvatar()
+  scene.add(avatar.root)
 
   // ondas RFID que saem do contêiner em foco
   const rings: THREE.Mesh[] = []
@@ -229,7 +250,7 @@ function buildWorld(photo?: HTMLImageElement): World {
   motes.frustumCulled = false
   scene.add(motes)
 
-  return { sky, water, port, light, buoys, badge, rings, motes, moteMat }
+  return { sky, water, port, light, buoys, badge, avatar, rings, motes, moteMat }
 }
 
 // ————————————————————————————————————————————————————————— rolagem
@@ -311,11 +332,14 @@ const readerLabel = $('#reader-label')
 const raycaster = new THREE.Raycaster()
 let hoverProject = -1
 let hoverBadge = false
+let hoverAvatar = false
+let lastMouseMove = -10
 let scanP = 0
 let scanned = -1
 let needsRay = false
 let drag: { x: number; y: number; moved: number; id: number } | null = null
 let flashBeam = 0
+let greetedFarol = false
 
 if (!IS_TOUCH) document.body.classList.add('has-cursor')
 addEventListener('pointermove', (e) => {
@@ -323,6 +347,7 @@ addEventListener('pointermove', (e) => {
   pointerPx.x = e.clientX
   pointerPx.y = e.clientY
   needsRay = true
+  if (e.pointerType === 'mouse') lastMouseMove = performance.now()
   if (drag && e.pointerId === drag.id && world) {
     const dx = e.clientX - drag.x
     drag.moved += Math.abs(dx) + Math.abs(e.clientY - drag.y)
@@ -352,12 +377,15 @@ canvas.addEventListener('click', (e) => {
   raycast()
   if (hoverProject >= 0) {
     manifest.show(hoverProject)
-  }
+  } else if (hoverAvatar) greet()
 })
 // os capítulos ficam por cima do canvas: repassa cliques em áreas vazias para a cena
 document.getElementById('chapters')!.addEventListener('click', (e) => {
   if (overUI(e.target)) return
+  mouse.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1)
+  raycast()
   if (hoverProject >= 0) manifest.show(hoverProject)
+  else if (hoverAvatar) greet()
 })
 document.getElementById('chapters')!.addEventListener('pointerdown', (e) => {
   if (overUI(e.target)) return
@@ -369,9 +397,11 @@ document.getElementById('chapters')!.addEventListener('pointerdown', (e) => {
 function raycast() {
   hoverProject = -1
   hoverBadge = false
+  hoverAvatar = false
   if (!world || manifest.isOpen()) return
   raycaster.setFromCamera(mouse, camera)
   const f = progress()
+  if (world.avatar.root.visible) hoverAvatar = raycaster.intersectObjects(world.avatar.hit, false).length > 0
   if (f > 0.5 && f < 1.6) {
     hoverBadge = raycaster.intersectObjects(world.badge.hit, false).length > 0
   }
@@ -382,6 +412,30 @@ function raycast() {
     )[0]
     if (hit) hoverProject = hit.object.userData.projectIndex as number
   }
+}
+
+// ————————————————————————————————————————————————————————— avatar: aceno + balão de fala
+const bubble = $('#bubble')
+let bubbleT = 0
+const HELLOS = [
+  'Oi! Eu sou o Roberto 👋',
+  'Bora construir algo juntos?',
+  'Tô compilando umas ideias aqui…',
+  'Role pra baixo, tem mais coisa!',
+  'Clicou de novo? Gostei de você 😄'
+]
+let helloI = 0
+function say(text: string, secs = 3.4) {
+  bubble.textContent = text
+  bubble.classList.add('show')
+  bubbleT = secs
+}
+function greet(text?: string) {
+  if (!world) return
+  world.avatar.wave()
+  audio.blip(990, 0.08)
+  setTimeout(() => audio.blip(1320, 0.08), 110)
+  say(text ?? HELLOS[helloI++ % HELLOS.length])
 }
 
 // ————————————————————————————————————————————————————————— redimensionamento
@@ -425,7 +479,9 @@ function stopPose(i: number, outPos: THREE.Vector3, outLook: THREE.Vector3, outS
   outLook.copy(s.look)
   outPos.copy(s.pos)
   if (isPortrait()) {
-    outPos.sub(s.look).multiplyScalar(s.mZoom).add(s.look)
+    if (s.mPos) outPos.copy(s.mPos)
+    if (s.mLook) outLook.copy(s.mLook)
+    outPos.sub(outLook).multiplyScalar(s.mZoom).add(outLook)
     outShift.set(s.mShift[0], s.mShift[1])
   } else outShift.set(s.shift[0], s.shift[1])
 }
@@ -694,6 +750,53 @@ function frame(time: number) {
   waterUniforms.uBeam.value = Math.max(contactK, Math.pow(facing, 30) * 0.8) + flashBeam
   skyUniforms.uFlash.value = contactK * (0.3 + 0.1 * Math.sin(t * 2)) + flashBeam * 0.4 + Math.pow(facing, 60) * 0.3
 
+  // ——— avatar
+  const atHero = fS < 1.7
+  const atFarol = fS > 8.1
+  const av = W.avatar
+  av.root.visible = atHero || atFarol
+  if (av.root.visible) {
+    const sit = fS < 4.5 ? 1 : 0
+    if (sit) {
+      av.root.position.copy(AVATAR_SIT)
+      av.root.rotation.y = 0.22
+    } else {
+      av.root.position.copy(AVATAR_STAND)
+      tmpA.subVectors(camera.position, AVATAR_STAND)
+      av.root.rotation.y = Math.atan2(tmpA.x, tmpA.z) - 0.35
+    }
+    // para onde olhar: o cursor (projetado na profundidade dele) ou a câmera
+    let lookW = 0
+    const lookPt = tmpB
+    const mouseFresh = performance.now() - lastMouseMove < 2600
+    if (!IS_TOUCH && mouseFresh && !atFarol) {
+      raycaster.setFromCamera(mouseS, camera)
+      const d = camera.position.distanceTo(av.root.position)
+      lookPt.copy(raycaster.ray.origin).addScaledVector(raycaster.ray.direction, d)
+      lookW = 1
+    } else {
+      lookPt.copy(camera.position)
+      lookW = atFarol ? 1 : clamp(fS * 3) // no toque/rolagem ele olha para você
+    }
+    av.update(dt, t, sit, lookPt, lookW, hoverAvatar)
+  }
+  if (bubbleT > 0) {
+    bubbleT -= dt
+    if (bubbleT <= 0 || !av.root.visible) {
+      bubble.classList.remove('show')
+      bubbleT = 0
+    }
+    av.headJoint.getWorldPosition(tmpA)
+    tmpA.y += 0.55
+    tmpA.project(camera)
+    bubble.style.transform = `translate3d(${((tmpA.x + 1) / 2) * innerWidth}px, ${((1 - tmpA.y) / 2) * innerHeight}px, 0)`
+  }
+  if (atFarol && !greetedFarol && fS > 8.8) {
+    greetedFarol = true
+    setTimeout(() => (isPortrait() ? world?.avatar.wave() : greet('Tô te esperando aqui no farol! 🔦')), 500)
+  }
+  if (fS < 8) greetedFarol = false
+
   // ——— luzes piscantes
   W.port.blinkers.forEach((b) => {
     b.mesh.visible = Math.sin(t * b.rate + b.phase) > 0.2
@@ -708,7 +811,7 @@ function frame(time: number) {
   scanP = scanning ? Math.min(1, scanP + dt / 0.7) : Math.max(0, scanP - dt * 3)
   reader.style.setProperty('--p', scanP.toFixed(3))
   reader.classList.toggle('scan', scanning)
-  reader.classList.toggle('hover', hoverBadge || !!document.querySelector('a:hover, button:hover'))
+  reader.classList.toggle('hover', hoverBadge || hoverAvatar || !!document.querySelector('a:hover, button:hover'))
   if (scanning && scanP >= 1 && scanned !== hoverProject) {
     scanned = hoverProject
     audio.blip(1480, 0.08)
@@ -717,7 +820,7 @@ function frame(time: number) {
     readerLabel.textContent = 'Lendo tag…'
   } else if (!scanning) {
     scanned = -1
-    readerLabel.textContent = hoverBadge ? 'Arraste · clique para virar' : ''
+    readerLabel.textContent = hoverBadge ? 'Arraste · clique para virar' : hoverAvatar ? 'Clique · diga oi' : ''
   }
   canvas.style.cursor = IS_TOUCH ? '' : 'none'
 
@@ -820,6 +923,7 @@ function enter() {
   document.body.classList.remove('loading')
   document.body.classList.add('ready')
   introStart = clock.getElapsed()
+  if (!INITIAL_HASH) setTimeout(() => progress() < 0.3 && greet(HELLOS[helloI++]), REDUCED_MOTION ? 400 : 3800)
   lenis.start()
   // entrada via link profundo (#farol etc.)
   const idx = chapters.findIndex((c) => c.id === INITIAL_HASH)

@@ -301,6 +301,31 @@ export function containerDoorMaps() {
   return { map: tex(col.c), normalMap: normalFromHeight(height, W, H, 4, false) }
 }
 
+/** Tábuas de madeira envelhecida para o píer (tábuas atravessadas ao longo de v). */
+export function woodTexture() {
+  const W = 256
+  const H = 512
+  const { c, ctx } = canvas(W, H)
+  const plank = 32
+  for (let y = 0; y < H; y += plank) {
+    const base = 70 + Math.random() * 30
+    ctx.fillStyle = `rgb(${base + 22},${base},${base - 18})`
+    ctx.fillRect(0, y, W, plank)
+    for (let i = 0; i < 26; i++) {
+      ctx.fillStyle = `rgba(${Math.random() < 0.5 ? '30,20,12' : '150,120,90'},${Math.random() * 0.18})`
+      ctx.fillRect(0, y + Math.random() * plank, W, 1 + Math.random())
+    }
+    ctx.fillStyle = 'rgba(0,0,0,0.75)'
+    ctx.fillRect(0, y, W, 2)
+    // pregos
+    ctx.fillStyle = 'rgba(40,40,44,0.9)'
+    for (const x of [18, W - 18]) ctx.fillRect(x, y + plank / 2 - 1, 3, 3)
+  }
+  const t = tex(c)
+  t.wrapS = t.wrapT = THREE.RepeatWrapping
+  return t
+}
+
 /** Concreto molhado: poças quase espelhadas (baixa rugosidade) e juntas de dilatação. */
 export function quayPBR() {
   const W = 512
