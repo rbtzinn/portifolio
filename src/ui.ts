@@ -18,17 +18,17 @@ export function buildChapters() {
     const s = el('section', 'chapter side-left project')
     s.id = `carga-${i + 1}`
     s.dataset.stop = String(2 + i)
-    s.dataset.name = i === 0 ? 'Pátio de cargas' : p.name
+    s.dataset.name = p.short
     s.innerHTML = `
       <div class="card">
-        <div class="kicker r" style="--k:.2">02 · Pátio de cargas <span class="proj-index">${String(i + 1).padStart(2, '0')}/05</span></div>
+        <div class="kicker r" style="--k:.2">02 · Projetos <span class="proj-index">${String(i + 1).padStart(2, '0')}/05</span></div>
         <h2 class="r" style="--k:.4">${esc(p.name)}</h2>
-        <div class="proj-meta r" style="--k:.55"><b>${esc(p.kind)}</b><span>${esc(p.year)}</span><span>${esc(p.code)}</span></div>
+        <div class="proj-meta r" style="--k:.55"><b>${esc(p.kind)}</b><span>${esc(p.year)}</span></div>
         <p class="proj-summary r" style="--k:.7">${esc(p.summary)}</p>
         <div class="chips r" style="--k:.85">${p.stack.map((t) => `<span>${esc(t)}</span>`).join('')}</div>
         <div class="actions r" style="--k:1">
           <a class="btn primary" href="${p.link}" target="_blank" rel="noopener" data-magnetic>${esc(p.linkLabel)} ↗</a>
-          <button class="btn" data-manifest="${i}" data-magnetic>Ler manifesto</button>
+          <button class="btn" data-manifest="${i}" data-magnetic>Ver detalhes</button>
         </div>
       </div>`
     host.appendChild(s)
@@ -83,7 +83,7 @@ export function createManifest(onOpen: (i: number) => void, onClose: () => void)
   let open = false
   let last: HTMLElement | null = null
   const fill = (p: Project) => {
-    $('#mf-code').textContent = p.code
+    $('#mf-code').textContent = `Projeto ${String(PROJECTS.indexOf(p) + 1).padStart(2, '0')} / ${String(PROJECTS.length).padStart(2, '0')}`
     $('#mf-name').textContent = p.name
     $('#mf-kind').textContent = `${p.kind} · ${p.year}`
     $('#mf-summary').textContent = p.summary
