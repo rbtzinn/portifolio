@@ -1179,3 +1179,38 @@ body.no-webgl #scene {
     display: none;
   }
 }
+
+/* ——— Números no "Sobre" */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.stats b {
+  display: block;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(30px, 3.4vw, 48px);
+  line-height: 1;
+  color: #fff;
+}
+.stats b::after {
+  content: '+';
+  color: var(--accent);
+}
+.stats span {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.coords #fps {
+  min-width: 52px;
+  display: inline-block;
+}

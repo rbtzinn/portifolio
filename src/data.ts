@@ -8,13 +8,13 @@ export const PROFILE = {
   whatsapp: 'https://wa.me/5581983312369',
   github: 'https://github.com/rbtzinn',
   linkedin: 'https://www.linkedin.com/in/roberto-gabriel-ara%C3%BAjo-miranda/',
-  cv: '/assets/cv.pdf',
-  photo: '/assets/foto.jpg'
+  cv: '/assets/cv.pdf'
 }
 
 export type Project = {
   code: string
   name: string
+  short: string
   kind: string
   year: string
   summary: string
@@ -31,6 +31,7 @@ export const PROJECTS: Project[] = [
   {
     code: 'RBTU 260101 7',
     name: 'Painel de Contratações Artísticas',
+    short: 'EMPETUR',
     kind: 'EMPETUR · Governo de PE',
     year: 'Jan 2026',
     summary:
@@ -49,6 +50,7 @@ export const PROJECTS: Project[] = [
   {
     code: 'RBTU 250602 3',
     name: 'Leitor RFID · Novo Atacarejo',
+    short: 'RFID',
     kind: 'Em produção · Varejo',
     year: 'Jun 2025',
     summary:
@@ -67,6 +69,7 @@ export const PROJECTS: Project[] = [
   {
     code: 'RBTU 260403 9',
     name: 'LUXE Store',
+    short: 'LUXE',
     kind: 'E-commerce Platform',
     year: 'Abr 2026',
     summary:
@@ -85,6 +88,7 @@ export const PROJECTS: Project[] = [
   {
     code: 'RBTU 260404 5',
     name: 'StreamVibe',
+    short: 'StreamVibe',
     kind: 'Plataforma de Streaming',
     year: 'Abr 2026',
     summary:
@@ -103,6 +107,7 @@ export const PROJECTS: Project[] = [
   {
     code: 'RBTU 260105 1',
     name: 'App de Frotas',
+    short: 'Frotas',
     kind: 'Mobile · Flutter',
     year: 'Jan 2026',
     summary:
@@ -132,7 +137,7 @@ export const LOGBOOK: LogEntry[] = [
     when: '2026 → hoje',
     role: 'Gestor Técnico · Compliance (TI & IA)',
     org: 'Administração de Suape',
-    note: 'Sim, o porto existe. Uso TI e IA para automatizar controles internos no Complexo Industrial Portuário de Suape.'
+    note: 'Uso TI e IA para automatizar controles internos e mapear processos no Complexo Industrial Portuário de Suape.'
   },
   {
     when: '2025 → hoje',

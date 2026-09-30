@@ -11,7 +11,8 @@ export const TIER = {
   bloom: !LOW,
   waterSegments: LOW ? 90 : 180,
   yardDensity: LOW ? 0.55 : 1,
-  stars: LOW ? 900 : 2200
+  stars: LOW ? 900 : 2200,
+  particles: LOW ? 24000 : 60000
 }
 
 export const REDUCED_MOTION =
