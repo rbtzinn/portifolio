@@ -1,6 +1,6 @@
 # Roberto Miranda · Portfólio
 
-Portfólio interativo em WebGL. Um único sistema de **60 mil partículas na GPU** (24 mil no celular) se transforma, conforme a rolagem, em uma escultura para cada parte da minha história:
+Portfólio interativo em WebGL. Um único sistema de **36 mil partículas na GPU** (20 mil no celular) se transforma, conforme a rolagem, em uma escultura para cada parte da minha história:
 
 | # | Capítulo | Forma |
 |---|----------|-------|

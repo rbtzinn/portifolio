@@ -82,7 +82,7 @@ if (renderer) {
   if (TIER.bloom) {
     composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType }))
     composer.addPass(new RenderPass(scene, camera))
-    bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth / 2, innerHeight / 2), 0.75, 0.6, 0.12)
+    bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth / 2, innerHeight / 2), 0.42, 0.5, 0.22)
     composer.addPass(bloom)
     composer.addPass(new OutputPass())
   }
@@ -328,11 +328,12 @@ function frame(time: number) {
 
   if (!renderer || !system) return
 
+  const sp = REDUCED_MOTION ? 0 : 1
   // ——— câmera: distância, lens shift (conteúdo à esquerda / embaixo) e paralaxe
   const portrait = isPortrait()
   camera.fov = portrait ? 55 : 42
   const dist = (portrait ? 11.5 : 9) + (1 - introE) * 14
-  camera.position.set(mouseS.x * 0.5, mouseS.y * 0.3, dist)
+  camera.position.set(mouseS.x * 0.25 * sp, mouseS.y * 0.15 * sp, dist)
   camera.lookAt(0, 0, 0)
   camera.updateProjectionMatrix()
   const sx = portrait ? 0 : 0.36
@@ -345,9 +346,8 @@ function frame(time: number) {
   system.setProgress(fS)
   const morph = system.uniforms.uMorph.value
   const mid = Math.sin(morph * Math.PI)
-  const sp = REDUCED_MOTION ? 0 : 1
-  group.rotation.y = damp(group.rotation.y, (Math.sin(t * 0.22) * 0.35 + mouseS.x * 0.45) * sp + mid * 0.5, 3, dt)
-  group.rotation.x = damp(group.rotation.x, (-mouseS.y * 0.22 + Math.sin(t * 0.17) * 0.06) * sp, 3, dt)
+  group.rotation.y = damp(group.rotation.y, (Math.sin(t * 0.12) * 0.12 + mouseS.x * 0.2) * sp + mid * 0.15, 2, dt)
+  group.rotation.x = damp(group.rotation.x, -mouseS.y * 0.1 * sp, 2, dt)
   group.scale.setScalar((0.25 + introE * 0.75) * (portrait ? 0.84 : 1))
 
   // ——— mouse repele as partículas
