@@ -1,6 +1,6 @@
 # Roberto Miranda · Portfólio
 
-Portfólio interativo em WebGL. Um único sistema de **60 mil partículas na GPU** (24 mil no celular) se transforma, conforme a rolagem, em uma escultura para cada parte da minha história:
+Portfólio interativo em WebGL. Um único sistema de **36 mil partículas na GPU** (20 mil no celular) se transforma, conforme a rolagem, em uma escultura para cada parte da minha história:
 
 | # | Capítulo | Forma |
 |---|----------|-------|
@@ -10,6 +10,15 @@ Portfólio interativo em WebGL. Um único sistema de **60 mil partículas na GPU
 | 03 | **Experiência** | Dupla hélice com um nó brilhante para cada experiência. |
 | 04 | **Stack** | Nó toroidal. |
 | 05 | **Contato** | Um `@` gigante. |
+
+## Componentes de interface
+
+Inspirados em [Cult UI](https://www.cult-ui.com) e [Skiper UI](https://skiper-ui.com), recriados em TypeScript puro (sem React) em [`src/components.ts`](src/components.ts):
+
+- **Janelas de navegador e celular** com capturas reais de cada projeto, tilt 3D e reflexo que seguem o cursor.
+- **Terminal animado** que "roda" o projeto RFID e "instala" a stack.
+- **Frase revelada palavra por palavra** na rolagem, entre a abertura e o Sobre.
+- **Números em odômetro**, **dynamic island** com o capítulo atual e o aviso de e-mail copiado, **botão com feixe de luz** e **dock** de contatos com ampliação.
 
 ## Como funciona
 

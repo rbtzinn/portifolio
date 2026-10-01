@@ -1,4 +1,5 @@
 import { LOGBOOK, PROJECTS, STACK, PROFILE, type Project } from './data'
+import { deviceMarkup, type TermLine } from './components'
 
 const $ = <T extends HTMLElement = HTMLElement>(s: string, root: ParentNode = document) => root.querySelector(s) as T
 
@@ -24,7 +25,7 @@ export function buildChapters() {
         <div class="kicker r" style="--k:.2">02 · Projetos <span class="proj-index">${String(i + 1).padStart(2, '0')}/05</span></div>
         <h2 class="r" style="--k:.4">${esc(p.name)}</h2>
         <div class="proj-meta r" style="--k:.55"><b>${esc(p.kind)}</b><span>${esc(p.year)}</span></div>
-        <p class="proj-summary r" style="--k:.7">${esc(p.summary)}</p>
+        <div class="device-wrap r" style="--k:.7">${deviceMarkup(p)}</div>
         <div class="chips r" style="--k:.85">${p.stack.map((t) => `<span>${esc(t)}</span>`).join('')}</div>
         <div class="actions r" style="--k:1">
           <a class="btn primary" href="${p.link}" target="_blank" rel="noopener" data-magnetic>${esc(p.linkLabel)} ↗</a>
@@ -42,13 +43,20 @@ export function buildChapters() {
     log.appendChild(li)
   })
 
+  // stack como um terminal que "instala" as ferramentas
+  const stackLines: TermLine[] = [
+    { t: 'cmd', s: 'npx roberto --stack' },
+    { t: 'dim', s: 'resolvendo dependências…' },
+    ...STACK.map((g) => ({ t: 'ok' as const, s: `✔ ${g.group.toLowerCase().padEnd(15, ' ')}${g.items.join(' · ')}` })),
+    { t: 'hl', s: '⚡ build concluído · pronto para produção' }
+  ]
   const stack = $('#stack')
-  STACK.forEach((g, i) => {
-    const d = el('div', 'grp r')
-    d.style.setProperty('--k', String(0.55 + i * 0.12))
-    d.innerHTML = `<span class="grp-name">${esc(g.group)}</span><div class="chips">${g.items.map((t) => `<span>${esc(t)}</span>`).join('')}</div>`
-    stack.appendChild(d)
-  })
+  stack.innerHTML = `
+    <div class="device term term-lg tilt r" style="--k:.6" id="stack-term" data-terminal='${JSON.stringify(stackLines).replace(/'/g, '&#39;')}'>
+      <div class="bar"><i></i><i></i><i></i><span class="url">~/roberto — zsh</span></div>
+      <pre class="term-body"></pre>
+      <span class="glare"></span>
+    </div>`
 
   $('#year').textContent = String(new Date().getFullYear())
 
@@ -85,6 +93,9 @@ export function createManifest(onOpen: (i: number) => void, onClose: () => void)
   const fill = (p: Project) => {
     $('#mf-code').textContent = `Projeto ${String(PROJECTS.indexOf(p) + 1).padStart(2, '0')} / ${String(PROJECTS.length).padStart(2, '0')}`
     $('#mf-name').textContent = p.name
+    $('#mf-shot').innerHTML = p.shot
+      ? `<img src="${p.shot}" alt="Captura do ${esc(p.name)}" class="${p.device === 'phone' ? 'is-phone' : ''}" />`
+      : ''
     $('#mf-kind').textContent = `${p.kind} · ${p.year}`
     $('#mf-summary').textContent = p.summary
     $('#mf-bullets').innerHTML = p.bullets.map((b) => `<li>${esc(b)}</li>`).join('')
@@ -133,15 +144,16 @@ export function toast(msg: string) {
   ;(t as HTMLElement & { _t?: number })._t = window.setTimeout(() => t.classList.remove('show'), 2200)
 }
 
-export function setupCopyEmail(onCopy: () => void) {
+export function setupCopyEmail(onCopy: (copied: boolean) => void) {
   $('#copy-email').addEventListener('click', async () => {
+    let ok = true
     try {
       await navigator.clipboard.writeText(PROFILE.email)
-      toast('E-mail copiado. Estou no aguardo! ✦')
     } catch {
+      ok = false
       location.href = `mailto:${PROFILE.email}`
     }
-    onCopy()
+    onCopy(ok)
   })
 }
 

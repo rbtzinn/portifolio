@@ -29,7 +29,7 @@ export function createParticles(n: number, shapes: Float32Array[], palettes: Pal
     uFrom2: { value: col(palettes[0][1]) },
     uTo1: { value: col(palettes[1][0]) },
     uTo2: { value: col(palettes[1][1]) },
-    uSize: { value: 0.028 },
+    uSize: { value: 0.034 },
     uScale: { value: 500 },
     uBright: { value: 1 }
   }
@@ -63,18 +63,18 @@ export function createParticles(n: number, shapes: Float32Array[], palettes: Pal
         e = e * e * (3.0 - 2.0 * e);
         vec3 p = mix(aFrom, aTo, e);
         float mid = sin(e * 3.14159);
-        p += swirl(p * 0.8, uTime) * mid * (0.9 + aRnd.w * 0.8);
+        p += swirl(p * 0.8, uTime * 0.5) * mid * (0.3 + aRnd.w * 0.25);
         // respiração
-        p += vec3(sin(uTime * 0.7 + aRnd.y * 40.0), cos(uTime * 0.6 + aRnd.z * 40.0), sin(uTime * 0.8 + aRnd.w * 40.0)) * 0.014;
+        p += vec3(sin(uTime * 0.35 + aRnd.y * 40.0), cos(uTime * 0.3 + aRnd.z * 40.0), sin(uTime * 0.4 + aRnd.w * 40.0)) * 0.006;
 
         // repulsão do mouse
         vec3 dm = p - uMouse;
         float dl = length(dm);
         float push = smoothstep(1.1, 0.0, dl) * uMouseK;
-        p += normalize(dm + 1e-5) * push * 0.6;
+        p += normalize(dm + 1e-5) * push * 0.35;
 
         // onda de choque do clique
-        float glow = push * 0.8;
+        float glow = push * 0.3;
         if (uPulse.w >= 0.0) {
           float r = uPulse.w * 5.5;
           float band = exp(-pow((length(p - uPulse.xyz) - r) * 2.2, 2.0)) * exp(-uPulse.w * 1.4);
@@ -85,12 +85,12 @@ export function createParticles(n: number, shapes: Float32Array[], palettes: Pal
         vec3 cFrom = mix(uFrom1, uFrom2, smoothstep(-2.0, 2.0, aFrom.y + (aRnd.y - 0.5) * 1.5));
         vec3 cTo = mix(uTo1, uTo2, smoothstep(-2.0, 2.0, aTo.y + (aRnd.y - 0.5) * 1.5));
         vCol = mix(cFrom, cTo, e) * (1.0 + glow) * uBright;
-        // alguns pontos cintilam
-        vA = 0.55 + 0.45 * step(0.93, aRnd.z) * (0.5 + 0.5 * sin(uTime * 3.0 + aRnd.x * 50.0));
+        // brilho estável (sem cintilar: cansa a vista)
+        vA = 0.6 + 0.25 * aRnd.z;
 
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         gl_Position = projectionMatrix * mv;
-        gl_PointSize = uSize * (0.55 + aRnd.z * 1.1) * (1.0 + mid * 0.6 + glow) * uScale / -mv.z;
+        gl_PointSize = uSize * (0.55 + aRnd.z * 1.1) * (1.0 + mid * 0.15 + glow) * uScale / -mv.z;
       }
     `,
     fragmentShader: /* glsl */ `
@@ -156,7 +156,7 @@ export function createDust(n: number) {
         p.y += sin(uTime * 0.1 + position.x) * 0.4;
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         gl_Position = projectionMatrix * mv;
-        vA = 0.25 + 0.2 * sin(uTime * 0.8 + position.z * 3.0);
+        vA = 0.22;
         gl_PointSize = 0.05 * uScale / -mv.z;
       }
     `,

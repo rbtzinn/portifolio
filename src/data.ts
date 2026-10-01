@@ -24,6 +24,10 @@ export type Project = {
   linkLabel: string
   color: string
   accent: string
+  device: 'browser' | 'phone' | 'terminal'
+  url: string
+  shot?: string
+  terminal?: { t: 'cmd' | 'out' | 'ok' | 'dim' | 'hl'; s: string }[]
 }
 
 // Cada projeto é um contêiner no pátio. `code` segue o formato ISO 6346.
@@ -43,6 +47,9 @@ export const PROJECTS: Project[] = [
     ],
     stack: ['React', 'Vite', 'Tailwind', 'Tremor', 'D3-geo', 'React Simple Maps', 'PapaParse'],
     link: 'https://empetur-painel.vercel.app/',
+    device: 'browser',
+    url: 'empetur-painel.vercel.app',
+    shot: '/assets/projects/empetur.webp',
     linkLabel: 'Ver ao vivo',
     color: '#e8672a',
     accent: '#ffb38a'
@@ -62,6 +69,18 @@ export const PROJECTS: Project[] = [
     ],
     stack: ['Android', 'Java', 'Kotlin', 'RFID', 'SQLite', 'CSV'],
     link: 'https://github.com/rbtzinn/RFID-NovoAtacarejo',
+    device: 'terminal',
+    url: 'rfid-novoatacarejo · android',
+    terminal: [
+      { t: 'cmd', s: 'git clone github.com/rbtzinn/RFID-NovoAtacarejo' },
+      { t: 'dim', s: 'Cloning into RFID-NovoAtacarejo… done.' },
+      { t: 'cmd', s: './gradlew installRelease' },
+      { t: 'ok', s: '✔ BUILD SUCCESSFUL' },
+      { t: 'out', s: '▸ leitor RFID conectado' },
+      { t: 'out', s: '▸ leitura de tags em tempo real por setor' },
+      { t: 'out', s: '▸ sincronizando inventário (SQLite → CSV)' },
+      { t: 'hl', s: '● em produção · Novo Atacarejo' }
+    ],
     linkLabel: 'Ver no GitHub',
     color: '#138f8a',
     accent: '#7ff3e6'
@@ -81,6 +100,9 @@ export const PROJECTS: Project[] = [
     ],
     stack: ['React', 'TypeScript', 'Tailwind', 'shadcn/ui', 'Zustand', 'i18n'],
     link: 'https://luxestore-eight.vercel.app/',
+    device: 'browser',
+    url: 'luxestore-eight.vercel.app',
+    shot: '/assets/projects/luxe.webp',
     linkLabel: 'Ver ao vivo',
     color: '#1b1b1f',
     accent: '#e9c46a'
@@ -100,6 +122,9 @@ export const PROJECTS: Project[] = [
     ],
     stack: ['React', 'TypeScript', 'Tailwind', 'TMDB API', 'Vite'],
     link: 'https://films-port.vercel.app/',
+    device: 'browser',
+    url: 'films-port.vercel.app',
+    shot: '/assets/projects/stream.webp',
     linkLabel: 'Ver ao vivo',
     color: '#b3202c',
     accent: '#ff8d95'
@@ -119,6 +144,9 @@ export const PROJECTS: Project[] = [
     ],
     stack: ['Flutter', 'Dart', 'Material 3', 'Apps Script'],
     link: 'https://frotasapp.vercel.app/',
+    device: 'phone',
+    url: 'frotasapp.vercel.app',
+    shot: '/assets/projects/frotas.webp',
     linkLabel: 'Ver ao vivo',
     color: '#2156c9',
     accent: '#9dbcff'
