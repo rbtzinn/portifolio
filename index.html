@@ -38,6 +38,7 @@
         <span class="brand-mark">RM</span>
         <span class="brand-text">Roberto Miranda<br /><em>Frontend Developer</em></span>
       </a>
+      <div class="island" id="island" aria-live="polite"><span class="island-dot"></span><span class="island-label">Início</span></div>
       <div class="hud-actions">
         <button class="chip-btn" id="sound" aria-pressed="false" aria-label="Ativar som ambiente">
           <span class="eq"><i></i><i></i><i></i><i></i></span><span class="label">Som</span>
@@ -118,21 +119,26 @@
             produto que precisa de uma interface boa e bem feita, vamos conversar.
           </p>
           <div class="cta r" style="--k: 0.8">
-            <button class="cta-main" id="copy-email" data-magnetic>
+            <button class="cta-main beam" id="copy-email" data-magnetic>
               <span class="cta-label">rbtgabriel04@gmail.com</span>
               <span class="cta-sub">clique para copiar</span>
             </button>
           </div>
-          <div class="links r" style="--k: 1">
-            <a href="https://wa.me/5581983312369" target="_blank" rel="noopener" data-magnetic>WhatsApp ↗</a>
-            <a href="https://www.linkedin.com/in/roberto-gabriel-ara%C3%BAjo-miranda/" target="_blank" rel="noopener" data-magnetic>LinkedIn ↗</a>
-            <a href="https://github.com/rbtzinn" target="_blank" rel="noopener" data-magnetic>GitHub ↗</a>
-            <a href="/assets/cv.pdf" target="_blank" rel="noopener" data-magnetic>Currículo PDF ↓</a>
-          </div>
+          <nav class="dock r" style="--k: 1" aria-label="Contatos">
+            <a class="dock-item wa" href="https://wa.me/5581983312369" target="_blank" rel="noopener"><span class="ico">WA</span><span class="tip">WhatsApp</span></a>
+            <a class="dock-item li" href="https://www.linkedin.com/in/roberto-gabriel-ara%C3%BAjo-miranda/" target="_blank" rel="noopener"><span class="ico">in</span><span class="tip">LinkedIn</span></a>
+            <a class="dock-item gh" href="https://github.com/rbtzinn" target="_blank" rel="noopener"><span class="ico">GH</span><span class="tip">GitHub</span></a>
+            <a class="dock-item ml" href="mailto:rbtgabriel04@gmail.com"><span class="ico">@</span><span class="tip">E-mail</span></a>
+            <a class="dock-item cv" href="/assets/cv.pdf" target="_blank" rel="noopener"><span class="ico">CV</span><span class="tip">Currículo PDF</span></a>
+          </nav>
           <small class="sign r" style="--k: 1.2">© <span id="year"></span> Roberto Miranda · feito à mão com Three.js e shaders próprios.</small>
         </div>
       </section>
     </main>
+
+    <div class="reveal" id="reveal" aria-hidden="true">
+      <p><span class="w">Código</span> <span class="w">limpo.</span> <span class="w accent">Interfaces</span> <span class="w accent">rápidas.</span><br /><span class="w">Dados</span> <span class="w">que</span> <span class="w">fazem</span> <span class="w">sentido.</span></p>
+    </div>
 
     <div id="spacer" aria-hidden="true"></div>
 
@@ -144,6 +150,7 @@
         <div class="mf-head">
           <span class="mf-code" id="mf-code"></span>
         </div>
+        <div class="mf-shot" id="mf-shot"></div>
         <h3 id="mf-name"></h3>
         <div class="mf-kind" id="mf-kind"></div>
         <p class="mf-summary" id="mf-summary"></p>

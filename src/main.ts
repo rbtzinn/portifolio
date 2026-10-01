@@ -17,6 +17,7 @@ import { PROFILE } from './data'
 import { IS_TOUCH, REDUCED_MOTION, TIER } from './tier'
 import { Ambience } from './audio'
 import { buildChapters, createManifest, noiseDataUrl, setupCopyEmail, setupMagnetic } from './ui'
+import { createIsland, createWordReveal, playTerminal, rollOdometers, setupDock, setupOdometers, setupTilt } from './components'
 import * as S from './scene/shapes'
 import { createDust, createParticles, type Palette } from './scene/particles'
 
@@ -39,6 +40,11 @@ const { chapters, railItems } = buildChapters()
 const N = chapters.length // 10 capítulos = 10 formas
 const audio = new Ambience()
 setupMagnetic()
+setupTilt()
+setupOdometers()
+setupDock()
+const island = createIsland()
+const wordReveal = createWordReveal()
 
 // Paletas (base → topo) de cada forma, na ordem dos capítulos
 const PALETTES: Palette[] = [
@@ -142,7 +148,8 @@ const manifest = createManifest(
   },
   () => lenis.start()
 )
-setupCopyEmail(() => {
+setupCopyEmail((ok) => {
+  island.flash(ok ? 'E-mail copiado ✓ Estou no aguardo!' : 'Abrindo seu app de e-mail…')
   audio.blip(1760, 0.1)
   pulse(new THREE.Vector3(0, 0, 0))
 })
@@ -226,8 +233,11 @@ function setChapter(k: number) {
   $('#cur').textContent = String(k).padStart(2, '0')
   if (prev !== -1) audio.whoosh()
   if (entered) history.replaceState(null, '', k === 0 ? location.pathname : `#${chapters[k].id}`)
-  if (k === 1) countUp()
+  island.chapter(k === 0 ? 'Roberto Miranda · Frontend' : `${String(k).padStart(2, '0')} · ${chapters[k].dataset.name}`)
+  if (k === 1) rollOdometers()
   if (k === 7) lightLog()
+  // terminais começam a digitar quando o capítulo aparece
+  playTerminal(chapters[k].querySelector<HTMLElement>('.term'))
 }
 const chapterState = chapters.map(() => ({ d: 9, v: -1 }))
 function updateChapters(f: number, introK: number) {
@@ -246,21 +256,6 @@ function updateChapters(f: number, introK: number) {
       st.d = d
       st.v = v
     }
-  })
-}
-let counted = false
-function countUp() {
-  if (counted) return
-  counted = true
-  document.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
-    const to = Number(el.dataset.count)
-    const t0 = performance.now()
-    const step = () => {
-      const k = clamp((performance.now() - t0) / 1200)
-      el.textContent = String(Math.round(to * (1 - Math.pow(1 - k, 3))))
-      if (k < 1) requestAnimationFrame(step)
-    }
-    step()
   })
 }
 let logLit = false
@@ -303,11 +298,15 @@ function frame(time: number) {
   fS = damp(fS, f, REDUCED_MOTION ? 60 : 8, dt)
   updateChapters(fS, introK)
   setChapter(Math.round(fS))
+  // frase que entra palavra por palavra entre a abertura e o "Sobre"
+  wordReveal(introK >= 1 ? clamp((fS - 0.1) / 0.8) : 0)
 
   // encaixe suave no capítulo mais próximo quando a rolagem para
   if (!REDUCED_MOTION && !snapping && !manifest.isOpen() && introK >= 1) {
     const near = Math.round(f)
-    if (performance.now() - lastScrollAt > 260 && Math.abs(f - near) > 0.004 && Math.abs(f - near) < 0.49) goTo(near)
+    // entre a abertura e o "Sobre" a pessoa pode parar para ler a frase
+    const reading = f > 0.22 && f < 0.78
+    if (!reading && performance.now() - lastScrollAt > 260 && Math.abs(f - near) > 0.004 && Math.abs(f - near) < 0.49) goTo(near)
   }
 
   mouseS.x = damp(mouseS.x, mouse.x, 4, dt)
@@ -337,7 +336,7 @@ function frame(time: number) {
   camera.lookAt(0, 0, 0)
   camera.updateProjectionMatrix()
   const sx = portrait ? 0 : 0.36
-  const sy = portrait ? 0.34 : 0
+  const sy = portrait ? 0.42 : 0
   camera.projectionMatrix.elements[8] = -sx * introE
   camera.projectionMatrix.elements[9] = -sy * introE
   camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert()

@@ -11,6 +11,15 @@ Portfólio interativo em WebGL. Um único sistema de **60 mil partículas na GPU
 | 04 | **Stack** | Nó toroidal. |
 | 05 | **Contato** | Um `@` gigante. |
 
+## Componentes de interface
+
+Inspirados em [Cult UI](https://www.cult-ui.com) e [Skiper UI](https://skiper-ui.com), recriados em TypeScript puro (sem React) em [`src/components.ts`](src/components.ts):
+
+- **Janelas de navegador e celular** com capturas reais de cada projeto, tilt 3D e reflexo que seguem o cursor.
+- **Terminal animado** que "roda" o projeto RFID e "instala" a stack.
+- **Frase revelada palavra por palavra** na rolagem, entre a abertura e o Sobre.
+- **Números em odômetro**, **dynamic island** com o capítulo atual e o aviso de e-mail copiado, **botão com feixe de luz** e **dock** de contatos com ampliação.
+
 ## Como funciona
 
 - Todas as formas são nuvens de pontos geradas no carregamento: amostragem de superfícies (`MeshSurfaceSampler`), texto desenhado em canvas e o mapa de PE pré-processado a partir do GeoJSON dos municípios (`public/assets/pe.bin`, Int16).
